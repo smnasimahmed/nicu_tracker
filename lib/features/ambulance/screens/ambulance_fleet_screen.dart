@@ -15,7 +15,10 @@ import '../controllers/ambulance_controller.dart';
 class AmbulanceFleetScreen extends StatelessWidget {
   const AmbulanceFleetScreen({super.key});
 
-  static void showAddForm(BuildContext context, AmbulanceController controller) {
+  static void showAddForm(
+    BuildContext context,
+    AmbulanceController controller,
+  ) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -33,12 +36,16 @@ class AmbulanceFleetScreen extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.airport_shuttle_outlined,
-                    size: 64,
-                    color: AppColors.textSecondary.withOpacity(0.4)),
+                Icon(
+                  Icons.airport_shuttle_outlined,
+                  size: 64,
+                  color: AppColors.textSecondary.withOpacity(0.4),
+                ),
                 const SizedBox(height: AppDimensions.paddingBase),
-                const Text('No ambulances registered yet.',
-                    style: AppTextStyles.bodyMedium),
+                const Text(
+                  'No ambulances registered yet.',
+                  style: AppTextStyles.bodyMedium,
+                ),
               ],
             ),
           );
@@ -48,8 +55,10 @@ class AmbulanceFleetScreen extends StatelessWidget {
           itemCount: controller.ambulances.length,
           separatorBuilder: (_, __) =>
               const SizedBox(height: AppDimensions.paddingM),
-          itemBuilder: (_, i) =>
-              _FleetCard(ambulance: controller.ambulances[i], controller: controller),
+          itemBuilder: (_, i) => _FleetCard(
+            ambulance: controller.ambulances[i],
+            controller: controller,
+          ),
         );
       },
     );
@@ -101,24 +110,32 @@ class _FleetCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(ambulance.vehicleName,
-                        style: AppTextStyles.labelLarge),
-                    Text(ambulance.registrationNumber,
-                        style: AppTextStyles.bodySmall),
+                    Text(
+                      ambulance.vehicleName,
+                      style: AppTextStyles.labelLarge,
+                    ),
+                    Text(
+                      ambulance.registrationNumber,
+                      style: AppTextStyles.bodySmall,
+                    ),
                   ],
                 ),
               ),
               // Edit button
               IconButton(
-                icon: const Icon(Icons.edit_outlined,
-                    color: AppColors.ambulancePrimary,
-                    size: AppDimensions.iconM),
+                icon: const Icon(
+                  Icons.edit_outlined,
+                  color: AppColors.ambulancePrimary,
+                  size: AppDimensions.iconM,
+                ),
                 onPressed: () => showModalBottomSheet(
                   context: context,
                   isScrollControlled: true,
                   backgroundColor: Colors.transparent,
-                  builder: (_) =>
-                      _AmbulanceFormSheet(controller: controller, existing: ambulance),
+                  builder: (_) => _AmbulanceFormSheet(
+                    controller: controller,
+                    existing: ambulance,
+                  ),
                 ),
               ),
             ],
@@ -130,9 +147,11 @@ class _FleetCard extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.location_on_outlined,
-                    size: AppDimensions.iconS,
-                    color: AppColors.textSecondary),
+                const Icon(
+                  Icons.location_on_outlined,
+                  size: AppDimensions.iconS,
+                  color: AppColors.textSecondary,
+                ),
                 const SizedBox(width: AppDimensions.paddingS),
                 Expanded(
                   child: Text(
@@ -148,21 +167,25 @@ class _FleetCard extends StatelessWidget {
           if (ambulance.hasNicuFacility)
             Row(
               children: [
-                const Icon(Icons.local_hospital_outlined,
-                    size: AppDimensions.iconS,
-                    color: AppColors.ambulancePrimary),
+                const Icon(
+                  Icons.local_hospital_outlined,
+                  size: AppDimensions.iconS,
+                  color: AppColors.ambulancePrimary,
+                ),
                 const SizedBox(width: AppDimensions.paddingS),
-                Text(AppStrings.nicuIcuAvailable,
-                    style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.ambulancePrimary,
-                        fontWeight: FontWeight.w600)),
+                Text(
+                  AppStrings.nicuIcuAvailable,
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.ambulancePrimary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ],
             ),
 
-          const SizedBox(height: AppDimensions.paddingBase),
-
           // Active toggle row
           Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
                 isActive ? 'Active' : 'Inactive',
@@ -213,9 +236,9 @@ class _AmbulanceFormSheetState extends State<_AmbulanceFormSheet> {
   void initState() {
     super.initState();
     _regCtrl = TextEditingController(
-        text: widget.existing?.registrationNumber ?? '');
-    _nameCtrl =
-        TextEditingController(text: widget.existing?.vehicleName ?? '');
+      text: widget.existing?.registrationNumber ?? '',
+    );
+    _nameCtrl = TextEditingController(text: widget.existing?.vehicleName ?? '');
     _hasNicu = widget.existing?.hasNicuFacility ?? false;
     _selectedAreas = List.from(widget.existing?.serviceAreas ?? []);
   }
@@ -258,7 +281,8 @@ class _AmbulanceFormSheetState extends State<_AmbulanceFormSheet> {
           decoration: const BoxDecoration(
             color: AppColors.white,
             borderRadius: BorderRadius.vertical(
-                top: Radius.circular(AppDimensions.radiusXL)),
+              top: Radius.circular(AppDimensions.radiusXL),
+            ),
           ),
           child: Column(
             children: [
@@ -269,15 +293,15 @@ class _AmbulanceFormSheetState extends State<_AmbulanceFormSheet> {
                 height: 4,
                 decoration: BoxDecoration(
                   color: AppColors.border,
-                  borderRadius:
-                      BorderRadius.circular(AppDimensions.radiusFull),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusFull),
                 ),
               ),
               // Sheet header
               Padding(
                 padding: const EdgeInsets.symmetric(
-                    horizontal: AppDimensions.paddingBase,
-                    vertical: AppDimensions.paddingM),
+                  horizontal: AppDimensions.paddingBase,
+                  vertical: AppDimensions.paddingM,
+                ),
                 child: Row(
                   children: [
                     Expanded(
@@ -300,8 +324,10 @@ class _AmbulanceFormSheetState extends State<_AmbulanceFormSheet> {
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close_rounded,
-                          color: AppColors.textSecondary),
+                      icon: const Icon(
+                        Icons.close_rounded,
+                        color: AppColors.textSecondary,
+                      ),
                       onPressed: () => Get.back(),
                     ),
                   ],
@@ -341,32 +367,34 @@ class _AmbulanceFormSheetState extends State<_AmbulanceFormSheet> {
 
                         // NICU toggle
                         Container(
-                          padding:
-                              const EdgeInsets.all(AppDimensions.paddingM),
+                          padding: const EdgeInsets.all(AppDimensions.paddingM),
                           decoration: BoxDecoration(
                             color: AppColors.inputFill,
-                            borderRadius:
-                                BorderRadius.circular(AppDimensions.radiusM),
+                            borderRadius: BorderRadius.circular(
+                              AppDimensions.radiusM,
+                            ),
                             border: Border.all(color: AppColors.border),
                           ),
                           child: Row(
                             children: [
                               Expanded(
                                 child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: const [
-                                    Text(AppStrings.nicuIcuAvailable,
-                                        style: AppTextStyles.labelLarge),
-                                    Text(AppStrings.nicuIcuDesc,
-                                        style: AppTextStyles.bodySmall),
+                                    Text(
+                                      AppStrings.nicuIcuAvailable,
+                                      style: AppTextStyles.labelLarge,
+                                    ),
+                                    Text(
+                                      AppStrings.nicuIcuDesc,
+                                      style: AppTextStyles.bodySmall,
+                                    ),
                                   ],
                                 ),
                               ),
                               Switch.adaptive(
                                 value: _hasNicu,
-                                onChanged: (v) =>
-                                    setState(() => _hasNicu = v),
+                                onChanged: (v) => setState(() => _hasNicu = v),
                                 activeColor: AppColors.ambulancePrimary,
                               ),
                             ],
@@ -375,8 +403,10 @@ class _AmbulanceFormSheetState extends State<_AmbulanceFormSheet> {
                         const SizedBox(height: AppDimensions.paddingBase),
 
                         // Service areas
-                        const Text(AppStrings.serviceArea,
-                            style: AppTextStyles.labelLarge),
+                        const Text(
+                          AppStrings.serviceArea,
+                          style: AppTextStyles.labelLarge,
+                        ),
                         const SizedBox(height: AppDimensions.paddingS),
                         Wrap(
                           spacing: AppDimensions.paddingS,
@@ -412,7 +442,8 @@ class _AmbulanceFormSheetState extends State<_AmbulanceFormSheet> {
                               backgroundColor: AppColors.white,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(
-                                    AppDimensions.radiusFull),
+                                  AppDimensions.radiusFull,
+                                ),
                               ),
                             );
                           }).toList(),
@@ -433,7 +464,7 @@ class _AmbulanceFormSheetState extends State<_AmbulanceFormSheet> {
                             const SizedBox(width: AppDimensions.paddingM),
                             Expanded(
                               child: AppButton(
-                                label: AppStrings.saveAmbulanceDetails,
+                                label: AppStrings.saveDetails,
                                 onPressed: _submit,
                                 color: AppColors.ambulancePrimary,
                                 fullWidth: false,

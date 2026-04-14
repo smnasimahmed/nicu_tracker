@@ -125,7 +125,7 @@ class AppStrings {
   static const String serviceArea = 'Service Area (Catchment)';
   static const String vehiclePhotos = 'Vehicle Photos (max 3)';
   static const String cancel = 'Cancel';
-  static const String saveAmbulanceDetails = 'Save Ambulance Details';
+  static const String saveDetails = 'Save Details';
   static const String editAmbulance = 'Edit Ambulance';
   static const String updateAmbulanceDesc = 'Update the details of your ambulance.';
   static const String addAmbulanceDesc = 'Add a new ambulance to your fleet.';
