@@ -25,11 +25,13 @@ class HospitalNicuBedsScreen extends StatelessWidget {
             crossAxisCount: MediaQuery.of(context).size.width > 600 ? 4 : 2,
             crossAxisSpacing: AppDimensions.paddingM,
             mainAxisSpacing: AppDimensions.paddingM,
-            childAspectRatio:
-                MediaQuery.of(context).size.width > 600 ? 0.9 : 0.78,
+            childAspectRatio: MediaQuery.of(context).size.width > 600
+                ? 0.9
+                : 0.78,
           ),
           itemCount: controller.beds.length,
-          itemBuilder: (_, i) => _BedCard(bed: controller.beds[i], controller: controller),
+          itemBuilder: (_, i) =>
+              _BedCard(bed: controller.beds[i], controller: controller),
         );
       },
     );
@@ -68,21 +70,24 @@ class _BedCard extends StatelessWidget {
             ),
             const SizedBox(height: AppDimensions.paddingS),
 
-            if (isOccupied) ...[ 
+            if (isOccupied) ...[
               const Divider(),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _InfoRow(label: 'Baby: ', value: bed.babyName ?? 'Unknown'),
-                    _InfoRow(label: 'Guardian: ', value: bed.guardianName ?? '-'),
+                    _InfoRow(
+                      label: 'Guardian: ',
+                      value: bed.guardianName ?? '-',
+                    ),
                     _InfoRow(label: 'Phone: ', value: bed.guardianPhone ?? '-'),
                     _InfoRow(
                       label: 'Admitted: ',
                       value: bed.admittedDate != null
                           ? '${bed.admittedDate!.year}-'
-                              '${bed.admittedDate!.month.toString().padLeft(2, '0')}-'
-                              '${bed.admittedDate!.day.toString().padLeft(2, '0')}'
+                                '${bed.admittedDate!.month.toString().padLeft(2, '0')}-'
+                                '${bed.admittedDate!.day.toString().padLeft(2, '0')}'
                           : '-',
                     ),
                   ],
@@ -107,15 +112,21 @@ class _BedCard extends StatelessWidget {
                         padding: const EdgeInsets.all(AppDimensions.paddingM),
                         decoration: BoxDecoration(
                           color: AppColors.statusAvailableBg,
-                          borderRadius:
-                              BorderRadius.circular(AppDimensions.radiusM),
+                          borderRadius: BorderRadius.circular(
+                            AppDimensions.radiusM,
+                          ),
                         ),
-                        child: const Icon(Icons.qr_code_rounded,
-                            size: 40, color: AppColors.statusAvailable),
+                        child: const Icon(
+                          Icons.qr_code_rounded,
+                          size: 40,
+                          color: AppColors.statusAvailable,
+                        ),
                       ),
                       const SizedBox(height: AppDimensions.paddingXS),
-                      const Text(AppStrings.scanToAdmit,
-                          style: AppTextStyles.bodySmall),
+                      const Text(
+                        AppStrings.scanToAdmit,
+                        style: AppTextStyles.bodySmall,
+                      ),
                     ],
                   ),
                 ),
@@ -132,9 +143,11 @@ class _BedCard extends StatelessWidget {
             if (isInTransit) ...[
               const Expanded(
                 child: Center(
-                  child: Text(AppStrings.patientIncoming,
-                      style: AppTextStyles.bodySmall,
-                      textAlign: TextAlign.center),
+                  child: Text(
+                    AppStrings.patientIncoming,
+                    style: AppTextStyles.bodySmall,
+                    textAlign: TextAlign.center,
+                  ),
                 ),
               ),
             ],
@@ -156,27 +169,40 @@ class _BedCard extends StatelessWidget {
       context: context,
       builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppDimensions.radiusL)),
-        title: const Text(AppStrings.confirmDischarge,
-            style: AppTextStyles.heading3),
-        content: const Text(AppStrings.confirmDischargeMessage,
-            style: AppTextStyles.bodyMedium),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+        ),
+        title: const Text(
+          AppStrings.confirmDischarge,
+          style: AppTextStyles.heading3,
+        ),
+        content: const Text(
+          AppStrings.confirmDischargeMessage,
+          style: AppTextStyles.bodyMedium,
+        ),
         actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text(AppStrings.cancel,
-                style: TextStyle(color: AppColors.textSecondary)),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Get.back();
-              controller.dischargePatient(bed.id);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.danger,
-              foregroundColor: AppColors.textWhite,
-            ),
-            child: const Text(AppStrings.discharge),
+          Row(
+            children: [
+              Expanded(
+                child: AppButton(
+                  label: AppStrings.discharge,
+                  style: AppButtonStyle.danger,
+                  onPressed: () {
+                    Get.back();
+                    controller.dischargePatient(bed.id);
+                  },
+                ),
+              ),
+              SizedBox(width: AppDimensions.paddingS),
+              Expanded(
+                child: AppButton(
+                  label: AppStrings.cancel,
+                  style: AppButtonStyle.outline,
+                  onPressed: () {
+                    Get.back();
+                  },
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -196,14 +222,18 @@ class _InfoRow extends StatelessWidget {
       child: RichText(
         text: TextSpan(
           style: const TextStyle(
-              fontSize: AppDimensions.fontS, color: AppColors.textPrimary),
+            fontSize: AppDimensions.fontS,
+            color: AppColors.textPrimary,
+          ),
           children: [
             TextSpan(
-                text: label,
-                style: const TextStyle(color: AppColors.textSecondary)),
+              text: label,
+              style: const TextStyle(color: AppColors.textSecondary),
+            ),
             TextSpan(
-                text: value,
-                style: const TextStyle(fontWeight: FontWeight.w500)),
+              text: value,
+              style: const TextStyle(fontWeight: FontWeight.w500),
+            ),
           ],
         ),
         maxLines: 1,
@@ -256,10 +286,12 @@ class _AdmitDialogState extends State<_AdmitDialog> {
   Widget build(BuildContext context) {
     return Dialog(
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppDimensions.radiusL)),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+      ),
       insetPadding: const EdgeInsets.symmetric(
-          horizontal: AppDimensions.paddingBase,
-          vertical: AppDimensions.paddingXXL),
+        horizontal: AppDimensions.paddingBase,
+        vertical: AppDimensions.paddingXXL,
+      ),
       child: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(AppDimensions.paddingXL),
@@ -281,16 +313,19 @@ class _AdmitDialogState extends State<_AdmitDialog> {
                             const TextSpan(
                               text: '(${AppStrings.readyForAdmission})',
                               style: TextStyle(
-                                  color: AppColors.statusAvailable,
-                                  fontSize: AppDimensions.fontM),
+                                color: AppColors.statusAvailable,
+                                fontSize: AppDimensions.fontM,
+                              ),
                             ),
                           ],
                         ),
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close_rounded,
-                          color: AppColors.textSecondary),
+                      icon: const Icon(
+                        Icons.close_rounded,
+                        color: AppColors.textSecondary,
+                      ),
                       onPressed: () => Get.back(),
                     ),
                   ],
@@ -298,7 +333,10 @@ class _AdmitDialogState extends State<_AdmitDialog> {
                 const SizedBox(height: AppDimensions.paddingXL),
 
                 // Baby Name (optional)
-                const Text(AppStrings.babyName, style: AppTextStyles.labelLarge),
+                const Text(
+                  AppStrings.babyName,
+                  style: AppTextStyles.labelLarge,
+                ),
                 const SizedBox(height: AppDimensions.paddingS),
                 TextFormField(
                   controller: _babyNameCtrl,
@@ -307,48 +345,70 @@ class _AdmitDialogState extends State<_AdmitDialog> {
                     hintStyle: AppTextStyles.hintText,
                     suffixIcon: TextButton(
                       onPressed: () => _babyNameCtrl.clear(),
-                      child: const Text(AppStrings.skip,
-                          style: TextStyle(
-                              color: AppColors.textSecondary,
-                              fontSize: AppDimensions.fontS,
-                              fontWeight: FontWeight.w600)),
+                      child: const Text(
+                        AppStrings.skip,
+                        style: TextStyle(
+                          color: AppColors.textSecondary,
+                          fontSize: AppDimensions.fontS,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
                     border: OutlineInputBorder(
-                        borderRadius:
-                            BorderRadius.circular(AppDimensions.radiusM),
-                        borderSide: const BorderSide(color: AppColors.border)),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusM,
+                      ),
+                      borderSide: const BorderSide(color: AppColors.border),
+                    ),
                     enabledBorder: OutlineInputBorder(
-                        borderRadius:
-                            BorderRadius.circular(AppDimensions.radiusM),
-                        borderSide: const BorderSide(color: AppColors.border)),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusM,
+                      ),
+                      borderSide: const BorderSide(color: AppColors.border),
+                    ),
                     focusedBorder: OutlineInputBorder(
-                        borderRadius:
-                            BorderRadius.circular(AppDimensions.radiusM),
-                        borderSide: const BorderSide(
-                            color: AppColors.hospitalPrimary, width: 2)),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusM,
+                      ),
+                      borderSide: const BorderSide(
+                        color: AppColors.hospitalPrimary,
+                        width: 2,
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: AppDimensions.paddingBase),
 
                 // Relation dropdown
-                const Text(AppStrings.relation, style: AppTextStyles.labelLarge),
+                const Text(
+                  AppStrings.relation,
+                  style: AppTextStyles.labelLarge,
+                ),
                 const SizedBox(height: AppDimensions.paddingS),
                 DropdownButtonFormField<String>(
                   value: _relation,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
-                        borderRadius:
-                            BorderRadius.circular(AppDimensions.radiusM),
-                        borderSide: const BorderSide(color: AppColors.border)),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusM,
+                      ),
+                      borderSide: const BorderSide(color: AppColors.border),
+                    ),
                     enabledBorder: OutlineInputBorder(
-                        borderRadius:
-                            BorderRadius.circular(AppDimensions.radiusM),
-                        borderSide: const BorderSide(color: AppColors.border)),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusM,
+                      ),
+                      borderSide: const BorderSide(color: AppColors.border),
+                    ),
                     focusedBorder: OutlineInputBorder(
-                        borderRadius:
-                            BorderRadius.circular(AppDimensions.radiusM),
-                        borderSide: const BorderSide(
-                            color: AppColors.hospitalPrimary, width: 2)),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusM,
+                      ),
+                      borderSide: const BorderSide(
+                        color: AppColors.hospitalPrimary,
+                        width: 2,
+                      ),
+                    ),
                   ),
                   items: ['Father', 'Mother', 'Guardian', 'Other']
                       .map((r) => DropdownMenuItem(value: r, child: Text(r)))
@@ -361,8 +421,9 @@ class _AdmitDialogState extends State<_AdmitDialog> {
                   label: AppStrings.contactName,
                   hint: AppStrings.enterGuardianName,
                   controller: _guardianNameCtrl,
-                  validator: (v) =>
-                      (v == null || v.isEmpty) ? AppStrings.fieldRequired : null,
+                  validator: (v) => (v == null || v.isEmpty)
+                      ? AppStrings.fieldRequired
+                      : null,
                 ),
                 const SizedBox(height: AppDimensions.paddingBase),
 
@@ -371,8 +432,9 @@ class _AdmitDialogState extends State<_AdmitDialog> {
                   hint: AppStrings.phoneHint,
                   controller: _phoneCtrl,
                   keyboardType: TextInputType.phone,
-                  validator: (v) =>
-                      (v == null || v.isEmpty) ? AppStrings.fieldRequired : null,
+                  validator: (v) => (v == null || v.isEmpty)
+                      ? AppStrings.fieldRequired
+                      : null,
                 ),
                 const SizedBox(height: AppDimensions.paddingXL),
 

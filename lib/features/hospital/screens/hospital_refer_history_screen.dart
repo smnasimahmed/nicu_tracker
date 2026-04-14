@@ -1,6 +1,7 @@
 // lib/features/hospital/screens/hospital_refer_history_screen.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:nicu_tracker/core/widgets/app_button.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_dimensions.dart';
 import '../../../core/constants/app_strings.dart';
@@ -19,8 +20,10 @@ class HospitalReferHistoryScreen extends StatelessWidget {
       builder: (controller) {
         if (controller.outgoingReferrals.isEmpty) {
           return const Center(
-            child: Text(AppStrings.noReferralHistory,
-                style: AppTextStyles.bodyMedium),
+            child: Text(
+              AppStrings.noReferralHistory,
+              style: AppTextStyles.bodyMedium,
+            ),
           );
         }
         return ListView.separated(
@@ -28,8 +31,10 @@ class HospitalReferHistoryScreen extends StatelessWidget {
           itemCount: controller.outgoingReferrals.length,
           separatorBuilder: (_, __) =>
               const SizedBox(height: AppDimensions.paddingM),
-          itemBuilder: (_, i) =>
-              _ReferralCard(referral: controller.outgoingReferrals[i], controller: controller),
+          itemBuilder: (_, i) => _ReferralCard(
+            referral: controller.outgoingReferrals[i],
+            controller: controller,
+          ),
         );
       },
     );
@@ -80,26 +85,35 @@ class _ReferralCard extends StatelessWidget {
           // Route: From → To
           Row(
             children: [
-              const Icon(Icons.local_hospital_outlined,
-                  size: AppDimensions.iconS, color: AppColors.textSecondary),
+              const Icon(
+                Icons.local_hospital_outlined,
+                size: AppDimensions.iconS,
+                color: AppColors.textSecondary,
+              ),
               const SizedBox(width: AppDimensions.paddingS),
               Expanded(
-                child: Text(referral.fromHospital,
-                    style: AppTextStyles.bodySmall,
-                    overflow: TextOverflow.ellipsis),
+                child: Text(
+                  referral.fromHospital,
+                  style: AppTextStyles.bodySmall,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
               const Padding(
                 padding: EdgeInsets.symmetric(
-                    horizontal: AppDimensions.paddingS),
-                child: Icon(Icons.arrow_forward_rounded,
-                    size: AppDimensions.iconS,
-                    color: AppColors.textSecondary),
+                  horizontal: AppDimensions.paddingS,
+                ),
+                child: Icon(
+                  Icons.arrow_forward_rounded,
+                  size: AppDimensions.iconS,
+                  color: AppColors.textSecondary,
+                ),
               ),
               Expanded(
                 child: Text(
                   referral.toHospital,
-                  style: AppTextStyles.bodySmall
-                      .copyWith(fontWeight: FontWeight.w600),
+                  style: AppTextStyles.bodySmall.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.right,
                 ),
@@ -111,8 +125,11 @@ class _ReferralCard extends StatelessWidget {
           // Date
           Row(
             children: [
-              const Icon(Icons.calendar_today_rounded,
-                  size: AppDimensions.iconS, color: AppColors.textSecondary),
+              const Icon(
+                Icons.calendar_today_rounded,
+                size: AppDimensions.iconS,
+                color: AppColors.textSecondary,
+              ),
               const SizedBox(width: AppDimensions.paddingS),
               Text(_formatDate(referral.date), style: AppTextStyles.bodySmall),
             ],
@@ -125,19 +142,22 @@ class _ReferralCard extends StatelessWidget {
               width: double.infinity,
               child: OutlinedButton.icon(
                 onPressed: () => _showCancelDialog(context),
-                icon: const Icon(Icons.cancel_outlined,
-                    size: AppDimensions.iconS),
+                icon: const Icon(
+                  Icons.cancel_outlined,
+                  size: AppDimensions.iconS,
+                ),
                 label: const Text(AppStrings.cancelReferral),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.danger,
                   side: const BorderSide(color: AppColors.danger),
                   minimumSize: const Size(0, 38),
                   shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(AppDimensions.radiusM)),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+                  ),
                   textStyle: const TextStyle(
-                      fontSize: AppDimensions.fontS,
-                      fontWeight: FontWeight.w600),
+                    fontSize: AppDimensions.fontS,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ),
@@ -152,29 +172,37 @@ class _ReferralCard extends StatelessWidget {
       context: context,
       builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppDimensions.radiusL)),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+        ),
         title: const Text('Cancel Referral', style: AppTextStyles.heading3),
         content: Text(
           'Cancel referral for ${referral.babyName} to ${referral.toHospital}?',
           style: AppTextStyles.bodyMedium,
         ),
         actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text(AppStrings.no,
-                style: TextStyle(color: AppColors.textSecondary)),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Get.back();
-              controller.cancelOutgoingReferral(referral.id);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.danger,
-              foregroundColor: AppColors.textWhite,
-              elevation: 0,
-            ),
-            child: const Text(AppStrings.yes),
+          Row(
+            children: [
+              Expanded(
+                child: AppButton(
+                  label: AppStrings.discharge,
+                  style: AppButtonStyle.danger,
+                  onPressed: () {
+                    Get.back();
+                    controller.cancelOutgoingReferral(referral.id);
+                  },
+                ),
+              ),
+              SizedBox(width: AppDimensions.paddingS),
+              Expanded(
+                child: AppButton(
+                  label: AppStrings.no,
+                  style: AppButtonStyle.outline,
+                  onPressed: () {
+                    Get.back();
+                  },
+                ),
+              ),
+            ],
           ),
         ],
       ),
