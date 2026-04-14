@@ -1,6 +1,7 @@
 // lib/features/hospital/screens/hospital_incoming_referrals_screen.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:nicu_tracker/core/widgets/app_button.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_dimensions.dart';
 import '../../../core/constants/app_strings.dart';
@@ -19,8 +20,10 @@ class HospitalIncomingReferralsScreen extends StatelessWidget {
       builder: (controller) {
         if (controller.incomingReferrals.isEmpty) {
           return const Center(
-            child: Text(AppStrings.noIncomingReferrals,
-                style: AppTextStyles.bodyMedium),
+            child: Text(
+              AppStrings.noIncomingReferrals,
+              style: AppTextStyles.bodyMedium,
+            ),
           );
         }
         return ListView.separated(
@@ -29,7 +32,9 @@ class HospitalIncomingReferralsScreen extends StatelessWidget {
           separatorBuilder: (_, __) =>
               const SizedBox(height: AppDimensions.paddingM),
           itemBuilder: (_, i) => _IncomingReferralCard(
-              referral: controller.incomingReferrals[i], controller: controller),
+            referral: controller.incomingReferrals[i],
+            controller: controller,
+          ),
         );
       },
     );
@@ -40,7 +45,10 @@ class _IncomingReferralCard extends StatelessWidget {
   final ReferralModel referral;
   final HospitalController controller;
 
-  const _IncomingReferralCard({required this.referral, required this.controller});
+  const _IncomingReferralCard({
+    required this.referral,
+    required this.controller,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -62,8 +70,10 @@ class _IncomingReferralCard extends StatelessWidget {
                   children: [
                     Text(referral.babyName, style: AppTextStyles.cardTitle),
                     const SizedBox(height: 2),
-                    Text('From: ${referral.fromHospital}',
-                        style: AppTextStyles.bodySmall),
+                    Text(
+                      'From: ${referral.fromHospital}',
+                      style: AppTextStyles.bodySmall,
+                    ),
                   ],
                 ),
               ),
@@ -73,20 +83,23 @@ class _IncomingReferralCard extends StatelessWidget {
           const Divider(height: AppDimensions.paddingXL),
 
           _DetailRow(
-              icon: Icons.person_outline_rounded,
-              label: 'Guardian',
-              value: referral.guardianContact),
+            icon: Icons.person_outline_rounded,
+            label: 'Guardian',
+            value: referral.guardianContact,
+          ),
           const SizedBox(height: AppDimensions.paddingS),
           if (referral.reasonForTransfer?.isNotEmpty == true)
             _DetailRow(
-                icon: Icons.info_outline_rounded,
-                label: 'Reason',
-                value: referral.reasonForTransfer!),
+              icon: Icons.info_outline_rounded,
+              label: 'Reason',
+              value: referral.reasonForTransfer!,
+            ),
           const SizedBox(height: AppDimensions.paddingS),
           _DetailRow(
-              icon: Icons.calendar_today_rounded,
-              label: 'Date',
-              value: _formatDate(referral.date)),
+            icon: Icons.calendar_today_rounded,
+            label: 'Date',
+            value: _formatDate(referral.date),
+          ),
 
           if (referral.status != ReferralStatus.completed &&
               referral.status != ReferralStatus.cancelled) ...[
@@ -99,7 +112,9 @@ class _IncomingReferralCard extends StatelessWidget {
                       label: AppStrings.confirmReferral,
                       color: AppColors.statusConfirm,
                       onPressed: () => controller.updateIncomingReferralStatus(
-                          referral.id, ReferralStatus.confirmed),
+                        referral.id,
+                        ReferralStatus.confirmed,
+                      ),
                     ),
                   ),
                   const SizedBox(width: AppDimensions.paddingS),
@@ -110,7 +125,9 @@ class _IncomingReferralCard extends StatelessWidget {
                       label: AppStrings.completeReferral,
                       color: AppColors.statusCompleted,
                       onPressed: () => controller.updateIncomingReferralStatus(
-                          referral.id, ReferralStatus.completed),
+                        referral.id,
+                        ReferralStatus.completed,
+                      ),
                     ),
                   ),
                 const SizedBox(width: AppDimensions.paddingS),
@@ -134,27 +151,40 @@ class _IncomingReferralCard extends StatelessWidget {
       context: context,
       builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppDimensions.radiusL)),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+        ),
         title: const Text('Cancel Referral', style: AppTextStyles.heading3),
-        content: const Text('Are you sure you want to cancel this referral?',
-            style: AppTextStyles.bodyMedium),
+        content: const Text(
+          'Are you sure you want to cancel this referral?',
+          style: AppTextStyles.bodyMedium,
+        ),
         actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text(AppStrings.no,
-                style: TextStyle(color: AppColors.textSecondary)),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Get.back();
-              controller.updateIncomingReferralStatus(
-                  referral.id, ReferralStatus.cancelled);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.danger,
-              foregroundColor: AppColors.textWhite,
-            ),
-            child: const Text(AppStrings.yes),
+          Row(
+            children: [
+              Expanded(
+                child: AppButton(
+                  label: AppStrings.no,
+                  style: AppButtonStyle.danger,
+                  onPressed: () {
+                    Get.back();
+                    controller.updateIncomingReferralStatus(
+                      referral.id,
+                      ReferralStatus.cancelled,
+                    );
+                  },
+                ),
+              ),
+              SizedBox(width: AppDimensions.paddingS),
+              Expanded(
+                child: AppButton(
+                  label: AppStrings.yes,
+                  style: AppButtonStyle.primary,
+                  onPressed: () {
+                    Get.back();
+                  },
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -170,8 +200,11 @@ class _DetailRow extends StatelessWidget {
   final String label;
   final String value;
 
-  const _DetailRow(
-      {required this.icon, required this.label, required this.value});
+  const _DetailRow({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -180,13 +213,16 @@ class _DetailRow extends StatelessWidget {
       children: [
         Icon(icon, size: AppDimensions.iconS, color: AppColors.textSecondary),
         const SizedBox(width: AppDimensions.paddingS),
-        Text('$label: ',
-            style: AppTextStyles.bodySmall
-                .copyWith(fontWeight: FontWeight.w600)),
+        Text(
+          '$label: ',
+          style: AppTextStyles.bodySmall.copyWith(fontWeight: FontWeight.w600),
+        ),
         Expanded(
-          child: Text(value,
-              style: AppTextStyles.bodySmall,
-              overflow: TextOverflow.ellipsis),
+          child: Text(
+            value,
+            style: AppTextStyles.bodySmall,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
       ],
     );
@@ -198,8 +234,11 @@ class _ActionButton extends StatelessWidget {
   final Color color;
   final VoidCallback onPressed;
 
-  const _ActionButton(
-      {required this.label, required this.color, required this.onPressed});
+  const _ActionButton({
+    required this.label,
+    required this.color,
+    required this.onPressed,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -211,13 +250,17 @@ class _ActionButton extends StatelessWidget {
         minimumSize: const Size(0, 38),
         elevation: 0,
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppDimensions.radiusM)),
-        padding: const EdgeInsets.symmetric(
-            horizontal: AppDimensions.paddingS),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.paddingS),
       ),
-      child: Text(label,
-          style: const TextStyle(
-              fontSize: AppDimensions.fontS, fontWeight: FontWeight.w600)),
+      child: Text(
+        label,
+        style: const TextStyle(
+          fontSize: AppDimensions.fontS,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
     );
   }
 }
