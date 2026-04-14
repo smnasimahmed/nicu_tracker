@@ -13,6 +13,7 @@ import 'hospital_nicu_beds_screen.dart';
 import 'hospital_refer_patient_screen.dart';
 import 'hospital_refer_history_screen.dart';
 import 'hospital_incoming_referrals_screen.dart';
+import 'hospital_profile_screen.dart';
 
 class HospitalMainScreen extends StatelessWidget {
   const HospitalMainScreen({super.key});
@@ -52,9 +53,7 @@ class HospitalMainScreen extends StatelessWidget {
               scrolledUnderElevation: 1,
               title: Text(_appBarTitle(controller.currentTabIndex),
                   style: AppTextStyles.heading3),
-              actions: [
-                _LogoutButton(),
-              ],
+              actions: [_ProfileAvatar()],
             ),
             body: _buildBody(controller.currentTabIndex),
             bottomNavigationBar: _HospitalBottomNav(controller: controller),
@@ -65,41 +64,36 @@ class HospitalMainScreen extends StatelessWidget {
   }
 }
 
-class _LogoutButton extends StatelessWidget {
+// Tappable avatar — opens profile as a modal bottom sheet
+class _ProfileAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authCtrl = Get.find<AuthController>();
+    final initials = authCtrl.currentUser?.name.isNotEmpty == true
+        ? authCtrl.currentUser!.name.substring(0, 2).toUpperCase()
+        : 'DR';
+
     return Padding(
       padding: const EdgeInsets.only(right: AppDimensions.paddingBase),
-      child: Row(
-        children: [
-          Text(
-            authCtrl.currentUser?.name ?? '',
-            style: AppTextStyles.bodySmall,
-          ),
-          const SizedBox(width: AppDimensions.paddingS),
-          CircleAvatar(
-            radius: 16,
-            backgroundColor: AppColors.hospitalPrimary,
-            child: Text(
-              authCtrl.currentUser?.name.isNotEmpty == true
-                  ? authCtrl.currentUser!.name.substring(0, 2).toUpperCase()
-                  : 'DR',
-              style: const TextStyle(
-                color: AppColors.textWhite,
-                fontSize: 11,
-                fontWeight: FontWeight.w700,
-              ),
+      child: GestureDetector(
+        onTap: () => showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+          builder: (_) => const HospitalProfileSheet(),
+        ),
+        child: CircleAvatar(
+          radius: 18,
+          backgroundColor: AppColors.hospitalPrimary,
+          child: Text(
+            initials,
+            style: const TextStyle(
+              color: AppColors.textWhite,
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
             ),
           ),
-          const SizedBox(width: AppDimensions.paddingS),
-          IconButton(
-            icon: const Icon(Icons.logout_rounded,
-                color: AppColors.textSecondary, size: AppDimensions.iconM),
-            tooltip: AppStrings.logout,
-            onPressed: () => authCtrl.logout(),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -112,44 +106,55 @@ class _HospitalBottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: AppDimensions.bottomNavHeight,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.white,
-        border: Border(top: BorderSide(color: AppColors.border)),
-      ),
-      child: Row(
-        children: [
-          _NavItem(
-            icon: Icons.dashboard_rounded,
-            label: AppStrings.dashboard,
-            selected: controller.currentTabIndex == 0,
-            onTap: () => controller.changeTab(0),
-          ),
-          _NavItem(
-            icon: Icons.bed_rounded,
-            label: AppStrings.nicuBeds,
-            selected: controller.currentTabIndex == 1,
-            onTap: () => controller.changeTab(1),
-          ),
-          _NavItem(
-            icon: Icons.send_rounded,
-            label: AppStrings.referPatient,
-            selected: controller.currentTabIndex == 2,
-            onTap: () => controller.changeTab(2),
-          ),
-          _NavItem(
-            icon: Icons.history_rounded,
-            label: AppStrings.referHistory,
-            selected: controller.currentTabIndex == 3,
-            onTap: () => controller.changeTab(3),
-          ),
-          _NavItem(
-            icon: Icons.inbox_rounded,
-            label: AppStrings.incomingReferrals,
-            selected: controller.currentTabIndex == 4,
-            onTap: () => controller.changeTab(4),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 12,
+            offset: const Offset(0, -2),
           ),
         ],
+      ),
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Row(
+            children: [
+              _NavItem(
+                icon: Icons.dashboard_rounded,
+                label: AppStrings.dashboard,
+                selected: controller.currentTabIndex == 0,
+                onTap: () => controller.changeTab(0),
+              ),
+              _NavItem(
+                icon: Icons.bed_rounded,
+                label: AppStrings.nicuBeds,
+                selected: controller.currentTabIndex == 1,
+                onTap: () => controller.changeTab(1),
+              ),
+              _NavItem(
+                icon: Icons.send_rounded,
+                label: AppStrings.referPatient,
+                selected: controller.currentTabIndex == 2,
+                onTap: () => controller.changeTab(2),
+              ),
+              _NavItem(
+                icon: Icons.history_rounded,
+                label: AppStrings.referHistory,
+                selected: controller.currentTabIndex == 3,
+                onTap: () => controller.changeTab(3),
+              ),
+              _NavItem(
+                icon: Icons.inbox_rounded,
+                label: AppStrings.incomingReferrals,
+                selected: controller.currentTabIndex == 4,
+                onTap: () => controller.changeTab(4),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -173,26 +178,45 @@ class _NavItem extends StatelessWidget {
     return Expanded(
       child: InkWell(
         onTap: onTap,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              color: selected ? AppColors.hospitalPrimary : AppColors.textSecondary,
-              size: AppDimensions.iconL,
-            ),
-            const SizedBox(height: 3),
-            Text(
-              label,
-              style: TextStyle(
-                color: selected ? AppColors.hospitalPrimary : AppColors.textSecondary,
-                fontSize: 9,
-                fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                decoration: BoxDecoration(
+                  color: selected
+                      ? AppColors.hospitalPrimary.withOpacity(0.12)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusFull),
+                ),
+                child: Icon(
+                  icon,
+                  color: selected
+                      ? AppColors.hospitalPrimary
+                      : AppColors.textSecondary,
+                  size: 22,
+                ),
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
+              const SizedBox(height: 3),
+              Text(
+                label,
+                style: TextStyle(
+                  color: selected
+                      ? AppColors.hospitalPrimary
+                      : AppColors.textSecondary,
+                  fontSize: 9,
+                  fontWeight: selected ? FontWeight.w700 : FontWeight.w400,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
         ),
       ),
     );

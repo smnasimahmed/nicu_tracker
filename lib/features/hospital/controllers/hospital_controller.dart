@@ -117,6 +117,25 @@ class HospitalController extends GetxController {
     );
   }
 
+  // ─── Cancel Outgoing Referral ─────────────────────────────────────────────
+
+  void cancelOutgoingReferral(String referralId) {
+    final idx = outgoingReferrals.indexWhere((r) => r.id == referralId);
+    if (idx == -1) return;
+    outgoingReferrals[idx] =
+        outgoingReferrals[idx].copyWith(status: ReferralStatus.cancelled);
+    update();
+    Get.snackbar(
+      'Referral cancelled',
+      '',
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Colors.orange.shade100,
+      colorText: Colors.orange.shade800,
+      duration: const Duration(seconds: 2),
+      margin: const EdgeInsets.all(12),
+    );
+  }
+
   // ─── Update Incoming Referral Status ──────────────────────────────────────
 
   void updateIncomingReferralStatus(String referralId, ReferralStatus status) {

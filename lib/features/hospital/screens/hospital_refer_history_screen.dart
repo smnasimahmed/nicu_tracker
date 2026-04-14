@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_dimensions.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../../core/constants/app_enums.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/status_badge.dart';
 import '../../../data/models/referral_model.dart';
@@ -22,103 +23,159 @@ class HospitalReferHistoryScreen extends StatelessWidget {
                 style: AppTextStyles.bodyMedium),
           );
         }
-        return SingleChildScrollView(
+        return ListView.separated(
           padding: const EdgeInsets.all(AppDimensions.paddingBase),
-          child: Column(
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  color: AppColors.divider,
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-                ),
-                child: const _TableHeader(),
-              ),
-              const SizedBox(height: AppDimensions.paddingXS),
-              ...controller.outgoingReferrals.map((r) => _ReferralRow(referral: r)),
-            ],
-          ),
+          itemCount: controller.outgoingReferrals.length,
+          separatorBuilder: (_, __) =>
+              const SizedBox(height: AppDimensions.paddingM),
+          itemBuilder: (_, i) =>
+              _ReferralCard(referral: controller.outgoingReferrals[i], controller: controller),
         );
       },
     );
   }
 }
 
-class _TableHeader extends StatelessWidget {
-  const _TableHeader();
+class _ReferralCard extends StatelessWidget {
+  final ReferralModel referral;
+  final HospitalController controller;
+
+  const _ReferralCard({required this.referral, required this.controller});
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(
-          horizontal: AppDimensions.paddingBase,
-          vertical: AppDimensions.paddingM),
-      child: Row(
+    final isCancellable = referral.status == ReferralStatus.pending;
+
+    return Container(
+      padding: const EdgeInsets.all(AppDimensions.paddingBase),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _HeaderCell(AppStrings.baby, flex: 2),
-          _HeaderCell(AppStrings.from, flex: 3),
-          _HeaderCell(AppStrings.to, flex: 3),
-          _HeaderCell(AppStrings.guardianLabel, flex: 2),
-          _HeaderCell(AppStrings.date, flex: 2),
-          _HeaderCell(AppStrings.status, flex: 2),
+          // Header row — baby name + status badge
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(referral.babyName, style: AppTextStyles.cardTitle),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Guardian: ${referral.guardianContact}',
+                      style: AppTextStyles.bodySmall,
+                    ),
+                  ],
+                ),
+              ),
+              ReferralStatusBadge(status: referral.status),
+            ],
+          ),
+          const Divider(height: AppDimensions.paddingXL),
+
+          // Route: From → To
+          Row(
+            children: [
+              const Icon(Icons.local_hospital_outlined,
+                  size: AppDimensions.iconS, color: AppColors.textSecondary),
+              const SizedBox(width: AppDimensions.paddingS),
+              Expanded(
+                child: Text(referral.fromHospital,
+                    style: AppTextStyles.bodySmall,
+                    overflow: TextOverflow.ellipsis),
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(
+                    horizontal: AppDimensions.paddingS),
+                child: Icon(Icons.arrow_forward_rounded,
+                    size: AppDimensions.iconS,
+                    color: AppColors.textSecondary),
+              ),
+              Expanded(
+                child: Text(
+                  referral.toHospital,
+                  style: AppTextStyles.bodySmall
+                      .copyWith(fontWeight: FontWeight.w600),
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.right,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppDimensions.paddingS),
+
+          // Date
+          Row(
+            children: [
+              const Icon(Icons.calendar_today_rounded,
+                  size: AppDimensions.iconS, color: AppColors.textSecondary),
+              const SizedBox(width: AppDimensions.paddingS),
+              Text(_formatDate(referral.date), style: AppTextStyles.bodySmall),
+            ],
+          ),
+
+          // Cancel button — only for pending referrals
+          if (isCancellable) ...[
+            const SizedBox(height: AppDimensions.paddingBase),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () => _showCancelDialog(context),
+                icon: const Icon(Icons.cancel_outlined,
+                    size: AppDimensions.iconS),
+                label: const Text(AppStrings.cancelReferral),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.danger,
+                  side: const BorderSide(color: AppColors.danger),
+                  minimumSize: const Size(0, 38),
+                  shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(AppDimensions.radiusM)),
+                  textStyle: const TextStyle(
+                      fontSize: AppDimensions.fontS,
+                      fontWeight: FontWeight.w600),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );
   }
-}
 
-class _HeaderCell extends StatelessWidget {
-  final String text;
-  final int flex;
-  const _HeaderCell(this.text, {this.flex = 1});
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      flex: flex,
-      child: Text(text,
-          style: AppTextStyles.labelMedium
-              .copyWith(fontWeight: FontWeight.w600)),
-    );
-  }
-}
-
-class _ReferralRow extends StatelessWidget {
-  final ReferralModel referral;
-  const _ReferralRow({required this.referral});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: AppDimensions.paddingXS),
-      padding: const EdgeInsets.symmetric(
-          horizontal: AppDimensions.paddingBase,
-          vertical: AppDimensions.paddingM),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Row(
-        children: [
-          Expanded(flex: 2,
-              child: Text(referral.babyName, style: AppTextStyles.bodyMedium)),
-          Expanded(flex: 3,
-              child: Text(referral.fromHospital,
-                  style: AppTextStyles.bodySmall,
-                  overflow: TextOverflow.ellipsis)),
-          Expanded(flex: 3,
-              child: Text(referral.toHospital,
-                  style: AppTextStyles.bodySmall,
-                  overflow: TextOverflow.ellipsis)),
-          Expanded(flex: 2,
-              child: Text(referral.guardianContact,
-                  style: AppTextStyles.bodySmall,
-                  overflow: TextOverflow.ellipsis)),
-          Expanded(flex: 2,
-              child: Text(_formatDate(referral.date),
-                  style: AppTextStyles.bodySmall)),
-          Expanded(flex: 2,
-              child: ReferralStatusBadge(status: referral.status)),
+  void _showCancelDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppDimensions.radiusL)),
+        title: const Text('Cancel Referral', style: AppTextStyles.heading3),
+        content: Text(
+          'Cancel referral for ${referral.babyName} to ${referral.toHospital}?',
+          style: AppTextStyles.bodyMedium,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text(AppStrings.no,
+                style: TextStyle(color: AppColors.textSecondary)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Get.back();
+              controller.cancelOutgoingReferral(referral.id);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.danger,
+              foregroundColor: AppColors.textWhite,
+              elevation: 0,
+            ),
+            child: const Text(AppStrings.yes),
+          ),
         ],
       ),
     );

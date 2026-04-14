@@ -20,48 +20,38 @@ class AmbulanceDashboardScreen extends StatelessWidget {
         return ListView(
           padding: const EdgeInsets.all(AppDimensions.paddingBase),
           children: [
-            // Stats
-            Row(
-              children: [
-                Expanded(
-                  child: _StatCard(
-                    label: AppStrings.totalRegistered,
-                    value: controller.totalRegistered.toString(),
-                    sublabel: AppStrings.ambulancesInFleet,
-                    icon: Icons.airport_shuttle_rounded,
-                    iconColor: AppColors.ambulancePrimary,
-                    borderColor: AppColors.ambulancePrimary,
-                  ),
-                ),
-                const SizedBox(width: AppDimensions.paddingM),
-                Expanded(
-                  child: _StatCard(
-                    label: AppStrings.activeAmbulances,
-                    value: controller.activeCount.toString(),
-                    sublabel: AppStrings.currentlyOnDuty,
-                    icon: Icons.favorite_rounded,
-                    iconColor: AppColors.statusAvailable,
-                    borderColor: AppColors.statusAvailable,
-                    valueColor: AppColors.statusAvailable,
-                  ),
-                ),
-                const SizedBox(width: AppDimensions.paddingM),
-                Expanded(
-                  child: _StatCard(
-                    label: AppStrings.inactiveMaintenance,
-                    value: controller.inactiveCount.toString(),
-                    sublabel: AppStrings.currentlyOffline,
-                    icon: Icons.warning_amber_rounded,
-                    iconColor: AppColors.warning,
-                    borderColor: AppColors.warning,
-                    valueColor: AppColors.warning,
-                  ),
-                ),
-              ],
+            // ── Stats — stacked vertically so text is fully visible ──────
+            _StatCard(
+              label: AppStrings.totalRegistered,
+              sublabel: AppStrings.ambulancesInFleet,
+              value: controller.totalRegistered.toString(),
+              icon: Icons.airport_shuttle_rounded,
+              iconColor: AppColors.ambulancePrimary,
+              accentColor: AppColors.ambulancePrimary,
+            ),
+            const SizedBox(height: AppDimensions.paddingM),
+            _StatCard(
+              label: AppStrings.activeAmbulances,
+              sublabel: AppStrings.currentlyOnDuty,
+              value: controller.activeCount.toString(),
+              icon: Icons.check_circle_rounded,
+              iconColor: AppColors.statusAvailable,
+              accentColor: AppColors.statusAvailable,
+              valueColor: AppColors.statusAvailable,
+            ),
+            const SizedBox(height: AppDimensions.paddingM),
+            _StatCard(
+              label: AppStrings.inactiveMaintenance,
+              sublabel: AppStrings.currentlyOffline,
+              value: controller.inactiveCount.toString(),
+              icon: Icons.warning_amber_rounded,
+              iconColor: AppColors.warning,
+              accentColor: AppColors.warning,
+              valueColor: AppColors.warning,
             ),
             const SizedBox(height: AppDimensions.paddingXL),
 
-            // Quick status overview
+            // ── Quick status overview ──────────────────────────────────
             Container(
               padding: const EdgeInsets.all(AppDimensions.paddingBase),
               decoration: BoxDecoration(
@@ -75,10 +65,20 @@ class AmbulanceDashboardScreen extends StatelessWidget {
                   const Text(AppStrings.quickStatusOverview,
                       style: AppTextStyles.heading3),
                   const SizedBox(height: AppDimensions.paddingM),
-                  ...controller.ambulances.map((amb) => _AmbulanceListItem(
-                        ambulance: amb,
-                        onToggle: () => controller.toggleStatus(amb.id),
-                      )),
+                  if (controller.ambulances.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(
+                          vertical: AppDimensions.paddingXL),
+                      child: Center(
+                        child: Text('No ambulances registered yet.',
+                            style: AppTextStyles.bodySmall),
+                      ),
+                    )
+                  else
+                    ...controller.ambulances.map((amb) => _AmbulanceListItem(
+                          ambulance: amb,
+                          onToggle: () => controller.toggleStatus(amb.id),
+                        )),
                 ],
               ),
             ),
@@ -91,31 +91,32 @@ class AmbulanceDashboardScreen extends StatelessWidget {
 
 class _StatCard extends StatelessWidget {
   final String label;
-  final String value;
   final String sublabel;
+  final String value;
   final IconData icon;
   final Color iconColor;
-  final Color borderColor;
+  final Color accentColor;
   final Color? valueColor;
 
   const _StatCard({
     required this.label,
-    required this.value,
     required this.sublabel,
+    required this.value,
     required this.icon,
     required this.iconColor,
-    required this.borderColor,
+    required this.accentColor,
     this.valueColor,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(AppDimensions.paddingM),
+      padding: const EdgeInsets.all(AppDimensions.paddingBase),
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-        border: Border(left: BorderSide(color: borderColor, width: 4)),
+        border: Border.all(color: AppColors.border),
+        // Accent left bar instead of squishing content 3-wide
         boxShadow: [
           BoxShadow(
               color: AppColors.shadow,
@@ -123,26 +124,40 @@ class _StatCard extends StatelessWidget {
               offset: const Offset(0, 2))
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(label,
+          // Accent icon box
+          Container(
+            width: 52,
+            height: 52,
+            decoration: BoxDecoration(
+              color: accentColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+            ),
+            child: Icon(icon, color: iconColor, size: AppDimensions.iconL),
+          ),
+          const SizedBox(width: AppDimensions.paddingBase),
+          // Labels
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(label, style: AppTextStyles.labelLarge),
+                const SizedBox(height: 2),
+                Text(sublabel,
                     style: AppTextStyles.bodySmall,
                     overflow: TextOverflow.ellipsis),
-              ),
-              Icon(icon, color: iconColor, size: AppDimensions.iconM),
-            ],
+              ],
+            ),
           ),
-          const SizedBox(height: AppDimensions.paddingS),
-          Text(value,
-              style: AppTextStyles.statNumber
-                  .copyWith(color: valueColor, fontSize: 28)),
-          Text(sublabel,
-              style: AppTextStyles.statLabel,
-              overflow: TextOverflow.ellipsis),
+          // Big number — never squished
+          Text(
+            value,
+            style: AppTextStyles.statNumber.copyWith(
+              color: valueColor ?? AppColors.textPrimary,
+              fontSize: 32,
+            ),
+          ),
         ],
       ),
     );
