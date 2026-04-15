@@ -75,13 +75,16 @@ class _HospitalReferPatientScreenState
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Patient Details
-                  const Text(AppStrings.patientDetails,
-                      style: AppTextStyles.heading3),
+                  const Text(
+                    AppStrings.patientDetails,
+                    style: AppTextStyles.heading3,
+                  ),
                   const SizedBox(height: AppDimensions.paddingBase),
                   AppTextField(
                     label: AppStrings.babyName,
                     hint: AppStrings.enterBabyName,
                     controller: _babyNameCtrl,
+                    prefixIcon: Icon(Icons.child_care_rounded),
                   ),
                   const SizedBox(height: AppDimensions.paddingBase),
                   AppTextField(
@@ -91,29 +94,33 @@ class _HospitalReferPatientScreenState
                     validator: (v) => (v == null || v.isEmpty)
                         ? AppStrings.guardianContactRequired
                         : null,
+                    prefixIcon: Icon(Icons.person_outline_rounded),
                   ),
                   const SizedBox(height: AppDimensions.paddingBase),
                   AppTextField(
                     label: AppStrings.reasonForTransfer,
                     hint: AppStrings.describeReason,
                     controller: _reasonCtrl,
-                    maxLines: 4,
+                    maxLines: 2,
                   ),
                   const SizedBox(height: AppDimensions.paddingXL),
 
                   // Destination
-                  const Text(AppStrings.destinationSelection,
-                      style: AppTextStyles.heading3),
+                  const Text(
+                    AppStrings.destinationSelection,
+                    style: AppTextStyles.heading3,
+                  ),
                   const SizedBox(height: AppDimensions.paddingBase),
-                  const Text(AppStrings.selectDestinationHospital,
-                      style: AppTextStyles.labelLarge),
+                  const Text(
+                    AppStrings.selectDestinationHospital,
+                    style: AppTextStyles.labelLarge,
+                  ),
                   const SizedBox(height: AppDimensions.paddingS),
                   _HospitalDropdown(
                     selected: _selectedHospital,
                     hospitals: DummyData.hospitals,
                     showDropdown: _showDropdown,
-                    onTap: () =>
-                        setState(() => _showDropdown = !_showDropdown),
+                    onTap: () => setState(() => _showDropdown = !_showDropdown),
                     onSelect: (h) => setState(() {
                       _selectedHospital = h;
                       _showDropdown = false;
@@ -122,13 +129,15 @@ class _HospitalReferPatientScreenState
                   if (_selectedHospital == null && !_showDropdown)
                     Padding(
                       padding: const EdgeInsets.only(
-                          top: AppDimensions.paddingXS,
-                          left: AppDimensions.paddingM),
+                        top: AppDimensions.paddingXS,
+                        left: AppDimensions.paddingM,
+                      ),
                       child: Text(
                         AppStrings.destinationRequired,
                         style: const TextStyle(
-                            color: AppColors.danger,
-                            fontSize: AppDimensions.fontS),
+                          color: AppColors.danger,
+                          fontSize: AppDimensions.fontS,
+                        ),
                       ),
                     ),
 
@@ -177,14 +186,16 @@ class _HospitalDropdown extends StatelessWidget {
             decoration: BoxDecoration(
               color: AppColors.inputFill,
               border: Border.all(
-                  color: showDropdown
-                      ? AppColors.hospitalPrimary
-                      : AppColors.border,
-                  width: showDropdown ? 2 : 1),
+                color: showDropdown
+                    ? AppColors.hospitalPrimary
+                    : AppColors.border,
+                width: showDropdown ? 2 : 1,
+              ),
               borderRadius: BorderRadius.circular(AppDimensions.radiusM),
             ),
             child: Row(
               children: [
+                Icon(Icons.apartment, color: AppColors.hospitalPrimaryLight),
                 Expanded(
                   child: Text(
                     selected?.name ?? AppStrings.chooseHospital,
@@ -212,9 +223,10 @@ class _HospitalDropdown extends StatelessWidget {
               borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               boxShadow: [
                 BoxShadow(
-                    color: AppColors.shadow,
-                    blurRadius: 8,
-                    offset: const Offset(0, 4))
+                  color: AppColors.shadow,
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
               ],
             ),
             child: Column(

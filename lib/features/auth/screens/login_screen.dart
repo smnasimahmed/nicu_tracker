@@ -143,8 +143,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Column(
                     children: [
                       AppTextField(
-                        label: AppStrings.email,
-                        hint: AppStrings.enterEmail,
+                        label: AppStrings.username,
+                        hint: AppStrings.enterEmailorPhone,
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
                         validator: (v) {

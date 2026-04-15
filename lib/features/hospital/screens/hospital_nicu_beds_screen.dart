@@ -61,10 +61,9 @@ class _BedCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
+            Column(
               children: [
                 Text(bed.bedCode, style: AppTextStyles.cardTitle),
-                const Spacer(),
                 BedStatusBadge(status: bed.status),
               ],
             ),
@@ -343,17 +342,6 @@ class _AdmitDialogState extends State<_AdmitDialog> {
                   decoration: InputDecoration(
                     hintText: AppStrings.enterBabyName,
                     hintStyle: AppTextStyles.hintText,
-                    suffixIcon: TextButton(
-                      onPressed: () => _babyNameCtrl.clear(),
-                      child: const Text(
-                        AppStrings.skip,
-                        style: TextStyle(
-                          color: AppColors.textSecondary,
-                          fontSize: AppDimensions.fontS,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(
                         AppDimensions.radiusM,

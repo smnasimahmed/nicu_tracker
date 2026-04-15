@@ -125,8 +125,8 @@ class _PatientRegisterScreenState extends State<PatientRegisterScreen> {
                       ),
                       const SizedBox(height: AppDimensions.paddingBase),
                       AppTextField(
-                        label: AppStrings.email,
-                        hint: AppStrings.enterEmail,
+                        label: AppStrings.username,
+                        hint: AppStrings.enterEmailorPhone,
                         controller: _emailCtrl,
                         keyboardType: TextInputType.emailAddress,
                         prefixIcon: const Icon(Icons.email_outlined,

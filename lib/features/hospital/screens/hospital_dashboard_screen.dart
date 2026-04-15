@@ -33,7 +33,7 @@ class HospitalDashboardScreen extends StatelessWidget {
               crossAxisCount: MediaQuery.of(context).size.width > 600 ? 4 : 2,
               crossAxisSpacing: AppDimensions.paddingM,
               mainAxisSpacing: AppDimensions.paddingM,
-              childAspectRatio: 1.6,
+              childAspectRatio: 2.2,
               children: [
                 _StatCard(
                   label: AppStrings.totalBeds,
@@ -100,6 +100,7 @@ class _StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
     return Container(
       padding: const EdgeInsets.all(AppDimensions.paddingM),
       decoration: BoxDecoration(
@@ -111,12 +112,20 @@ class _StatCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(children: [Icon(icon, color: iconColor, size: AppDimensions.iconL)]),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Row(
             children: [
-              Text(value, style: AppTextStyles.statNumber.copyWith(fontSize: 24)),
-              Text(label, style: AppTextStyles.statLabel),
+              Icon(icon, color: iconColor, size: AppDimensions.iconL),
+              SizedBox(width: screenWidth * 0.03),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    value,
+                    style: AppTextStyles.statNumber.copyWith(fontSize: 24),
+                  ),
+                  Text(label, style: AppTextStyles.statLabel),
+                ],
+              ),
             ],
           ),
         ],
@@ -151,8 +160,11 @@ class _DashboardBedCard extends StatelessWidget {
                 color: AppColors.statusAvailableBg,
                 borderRadius: BorderRadius.circular(AppDimensions.radiusS),
               ),
-              child: const Icon(Icons.qr_code_rounded,
-                  color: AppColors.statusAvailable, size: 28),
+              child: const Icon(
+                Icons.qr_code_rounded,
+                color: AppColors.statusAvailable,
+                size: 28,
+              ),
             ),
           const SizedBox(height: AppDimensions.paddingXS),
           _statusChip(bed.status),
@@ -185,21 +197,26 @@ class _DashboardBedCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-          color: bg,
-          borderRadius: BorderRadius.circular(AppDimensions.radiusFull)),
+        color: bg,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusFull),
+      ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-              width: 6,
-              height: 6,
-              decoration: BoxDecoration(color: dot, shape: BoxShape.circle)),
+            width: 6,
+            height: 6,
+            decoration: BoxDecoration(color: dot, shape: BoxShape.circle),
+          ),
           const SizedBox(width: 4),
-          Text(label,
-              style: TextStyle(
-                  color: dot,
-                  fontSize: AppDimensions.fontXS,
-                  fontWeight: FontWeight.w600)),
+          Text(
+            label,
+            style: TextStyle(
+              color: dot,
+              fontSize: AppDimensions.fontXS,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ],
       ),
     );

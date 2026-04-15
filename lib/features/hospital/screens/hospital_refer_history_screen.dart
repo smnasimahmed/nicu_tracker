@@ -184,7 +184,7 @@ class _ReferralCard extends StatelessWidget {
             children: [
               Expanded(
                 child: AppButton(
-                  label: AppStrings.discharge,
+                  label: AppStrings.yes,
                   style: AppButtonStyle.danger,
                   onPressed: () {
                     Get.back();
