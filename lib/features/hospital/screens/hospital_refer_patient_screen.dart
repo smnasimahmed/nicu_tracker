@@ -88,13 +88,6 @@ class _HospitalReferPatientScreenState
                     style: AppTextStyles.heading3,
                   ),
                   const SizedBox(height: AppDimensions.paddingBase),
-                  AppTextField(
-                    label: AppStrings.babyName,
-                    hint: AppStrings.enterBabyName,
-                    controller: _babyNameCtrl,
-                    prefixIcon: Icon(Icons.child_care_rounded),
-                  ),
-                  const SizedBox(height: AppDimensions.paddingBase),
 
                   // Relation dropdown
                   const Text(
@@ -106,20 +99,25 @@ class _HospitalReferPatientScreenState
                     value: _relation,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
-                        borderRadius:
-                            BorderRadius.circular(AppDimensions.radiusM),
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusM,
+                        ),
                         borderSide: const BorderSide(color: AppColors.border),
                       ),
                       enabledBorder: OutlineInputBorder(
-                        borderRadius:
-                            BorderRadius.circular(AppDimensions.radiusM),
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusM,
+                        ),
                         borderSide: const BorderSide(color: AppColors.border),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderRadius:
-                            BorderRadius.circular(AppDimensions.radiusM),
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusM,
+                        ),
                         borderSide: const BorderSide(
-                            color: AppColors.hospitalPrimary, width: 2),
+                          color: AppColors.hospitalPrimary,
+                          width: 2,
+                        ),
                       ),
                       filled: true,
                       fillColor: AppColors.inputFill,
@@ -157,6 +155,14 @@ class _HospitalReferPatientScreenState
                   const SizedBox(height: AppDimensions.paddingBase),
 
                   AppTextField(
+                    label: AppStrings.babyName,
+                    hint: AppStrings.enterBabyName,
+                    controller: _babyNameCtrl,
+                    prefixIcon: Icon(Icons.child_care_rounded),
+                  ),
+                  const SizedBox(height: AppDimensions.paddingBase),
+
+                  AppTextField(
                     label: AppStrings.reasonForTransfer,
                     hint: AppStrings.describeReason,
                     controller: _reasonCtrl,
@@ -179,8 +185,7 @@ class _HospitalReferPatientScreenState
                     selected: _selectedHospital,
                     hospitals: DummyData.hospitals,
                     showDropdown: _showDropdown,
-                    onTap: () =>
-                        setState(() => _showDropdown = !_showDropdown),
+                    onTap: () => setState(() => _showDropdown = !_showDropdown),
                     onSelect: (h) => setState(() {
                       _selectedHospital = h;
                       _showDropdown = false;
@@ -193,8 +198,9 @@ class _HospitalReferPatientScreenState
                   if (_selectedHospital == null && !_showDropdown)
                     Padding(
                       padding: const EdgeInsets.only(
-                          top: AppDimensions.paddingXS,
-                          left: AppDimensions.paddingM),
+                        top: AppDimensions.paddingXS,
+                        left: AppDimensions.paddingM,
+                      ),
                       child: Text(
                         AppStrings.destinationRequired,
                         style: const TextStyle(
@@ -317,7 +323,8 @@ class _HospitalSelector extends StatelessWidget {
                             if (isSelected)
                               Padding(
                                 padding: const EdgeInsets.only(
-                                    right: AppDimensions.paddingS),
+                                  right: AppDimensions.paddingS,
+                                ),
                                 child: Icon(
                                   Icons.check_rounded,
                                   size: 16,
@@ -396,8 +403,11 @@ class _SelectedHospitalCard extends StatelessWidget {
           const SizedBox(height: 4),
           Row(
             children: [
-              const Icon(Icons.location_on_outlined,
-                  size: 14, color: AppColors.textSecondary),
+              const Icon(
+                Icons.location_on_outlined,
+                size: 14,
+                color: AppColors.textSecondary,
+              ),
               const SizedBox(width: 4),
               Text(
                 hospital.district != null && hospital.division != null
