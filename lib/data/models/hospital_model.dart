@@ -8,6 +8,8 @@ class HospitalModel {
   final int availableBeds;
   final String? phone;
   final double? distanceKm;
+  final String? district;
+  final String? division;
 
   const HospitalModel({
     required this.id,
@@ -17,6 +19,8 @@ class HospitalModel {
     required this.availableBeds,
     this.phone,
     this.distanceKm,
+    this.district,
+    this.division,
   });
 
   int get occupiedBeds => totalBeds - availableBeds;

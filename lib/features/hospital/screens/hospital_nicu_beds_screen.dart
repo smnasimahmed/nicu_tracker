@@ -19,21 +19,55 @@ class HospitalNicuBedsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetBuilder<HospitalController>(
       builder: (controller) {
-        return GridView.builder(
-          padding: const EdgeInsets.all(AppDimensions.paddingBase),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: MediaQuery.of(context).size.width > 600 ? 4 : 2,
-            crossAxisSpacing: AppDimensions.paddingM,
-            mainAxisSpacing: AppDimensions.paddingM,
-            childAspectRatio: MediaQuery.of(context).size.width > 600
-                ? 0.9
-                : 0.78,
-          ),
-          itemCount: controller.beds.length,
-          itemBuilder: (_, i) =>
-              _BedCard(bed: controller.beds[i], controller: controller),
+        return Stack(
+          children: [
+            GridView.builder(
+              padding: const EdgeInsets.fromLTRB(
+                AppDimensions.paddingBase,
+                AppDimensions.paddingBase,
+                AppDimensions.paddingBase,
+                80, // extra bottom padding for FAB
+              ),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: MediaQuery.of(context).size.width > 600 ? 4 : 2,
+                crossAxisSpacing: AppDimensions.paddingM,
+                mainAxisSpacing: AppDimensions.paddingM,
+                childAspectRatio: MediaQuery.of(context).size.width > 600
+                    ? 0.9
+                    : 0.78,
+              ),
+              itemCount: controller.beds.length,
+              itemBuilder: (_, i) =>
+                  _BedCard(bed: controller.beds[i], controller: controller),
+            ),
+
+            // ── Add New Bed FAB ────────────────────────────────────────
+            Positioned(
+              right: AppDimensions.paddingBase,
+              bottom: AppDimensions.paddingBase,
+              child: FloatingActionButton.extended(
+                onPressed: () => _showAddBedDialog(context, controller),
+                backgroundColor: AppColors.hospitalPrimary,
+                icon: const Icon(Icons.add_rounded, color: AppColors.textWhite),
+                label: const Text(
+                  AppStrings.addNewBed,
+                  style: TextStyle(
+                    color: AppColors.textWhite,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ],
         );
       },
+    );
+  }
+
+  void _showAddBedDialog(BuildContext context, HospitalController controller) {
+    showDialog(
+      context: context,
+      builder: (_) => _AddBedDialog(controller: controller),
     );
   }
 }
@@ -61,10 +95,41 @@ class _BedCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Column(
+            // ── Bed Code + Status centered, delete top-right ──────────
+            Stack(
               children: [
-                Text(bed.bedCode, style: AppTextStyles.cardTitle),
-                BedStatusBadge(status: bed.status),
+                Center(
+                  child: Column(
+                    children: [
+                      Text(bed.bedCode, style: AppTextStyles.cardTitle),
+                      const SizedBox(height: 4),
+                      BedStatusBadge(status: bed.status),
+                    ],
+                  ),
+                ),
+                isOccupied || isInTransit
+                    ? SizedBox.shrink()
+                    : Positioned(
+                        top: 0,
+                        right: 0,
+                        child: GestureDetector(
+                          onTap: () => _showDeleteDialog(context),
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: AppColors.statusOccupiedBg,
+                              borderRadius: BorderRadius.circular(
+                                AppDimensions.radiusS,
+                              ),
+                            ),
+                            child: const Icon(
+                              Icons.delete_outline_rounded,
+                              color: AppColors.statusOccupied,
+                              size: 16,
+                            ),
+                          ),
+                        ),
+                      ),
               ],
             ),
             const SizedBox(height: AppDimensions.paddingS),
@@ -196,9 +261,47 @@ class _BedCard extends StatelessWidget {
                 child: AppButton(
                   label: AppStrings.cancel,
                   style: AppButtonStyle.outline,
+                  onPressed: Get.back,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDeleteDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+        ),
+        title: const Text(AppStrings.deleteBed, style: AppTextStyles.heading3),
+        content: Text(
+          'Are you sure you want to delete bed ${bed.bedCode}? This action cannot be undone.',
+          style: AppTextStyles.bodyMedium,
+        ),
+        actions: [
+          Row(
+            children: [
+              Expanded(
+                child: AppButton(
+                  label: AppStrings.delete,
+                  style: AppButtonStyle.danger,
                   onPressed: () {
                     Get.back();
+                    controller.deleteBed(bed.id);
                   },
+                ),
+              ),
+              SizedBox(width: AppDimensions.paddingS),
+              Expanded(
+                child: AppButton(
+                  label: AppStrings.cancel,
+                  style: AppButtonStyle.outline,
+                  onPressed: Get.back,
                 ),
               ),
             ],
@@ -300,7 +403,6 @@ class _AdmitDialogState extends State<_AdmitDialog> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Title
                 Row(
                   children: [
                     Expanded(
@@ -325,49 +427,12 @@ class _AdmitDialogState extends State<_AdmitDialog> {
                         Icons.close_rounded,
                         color: AppColors.textSecondary,
                       ),
-                      onPressed: () => Get.back(),
+                      onPressed: Get.back,
                     ),
                   ],
                 ),
                 const SizedBox(height: AppDimensions.paddingXL),
 
-                // Baby Name (optional)
-                const Text(
-                  AppStrings.babyName,
-                  style: AppTextStyles.labelLarge,
-                ),
-                const SizedBox(height: AppDimensions.paddingS),
-                TextFormField(
-                  controller: _babyNameCtrl,
-                  decoration: InputDecoration(
-                    hintText: AppStrings.enterBabyName,
-                    hintStyle: AppTextStyles.hintText,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(
-                        AppDimensions.radiusM,
-                      ),
-                      borderSide: const BorderSide(color: AppColors.border),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(
-                        AppDimensions.radiusM,
-                      ),
-                      borderSide: const BorderSide(color: AppColors.border),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(
-                        AppDimensions.radiusM,
-                      ),
-                      borderSide: const BorderSide(
-                        color: AppColors.hospitalPrimary,
-                        width: 2,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: AppDimensions.paddingBase),
-
-                // Relation dropdown
                 const Text(
                   AppStrings.relation,
                   style: AppTextStyles.labelLarge,
@@ -403,6 +468,7 @@ class _AdmitDialogState extends State<_AdmitDialog> {
                       .toList(),
                   onChanged: (v) => setState(() => _relation = v!),
                 ),
+
                 const SizedBox(height: AppDimensions.paddingBase),
 
                 AppTextField(
@@ -413,6 +479,7 @@ class _AdmitDialogState extends State<_AdmitDialog> {
                       ? AppStrings.fieldRequired
                       : null,
                 ),
+
                 const SizedBox(height: AppDimensions.paddingBase),
 
                 AppTextField(
@@ -424,6 +491,43 @@ class _AdmitDialogState extends State<_AdmitDialog> {
                       ? AppStrings.fieldRequired
                       : null,
                 ),
+
+                const SizedBox(height: AppDimensions.paddingBase),
+
+                const Text(
+                  AppStrings.babyName,
+                  style: AppTextStyles.labelLarge,
+                ),
+                const SizedBox(height: AppDimensions.paddingS),
+                TextFormField(
+                  controller: _babyNameCtrl,
+                  decoration: InputDecoration(
+                    hintText: AppStrings.enterBabyName,
+                    hintStyle: AppTextStyles.hintText,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusM,
+                      ),
+                      borderSide: const BorderSide(color: AppColors.border),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusM,
+                      ),
+                      borderSide: const BorderSide(color: AppColors.border),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusM,
+                      ),
+                      borderSide: const BorderSide(
+                        color: AppColors.hospitalPrimary,
+                        width: 2,
+                      ),
+                    ),
+                  ),
+                ),
+
                 const SizedBox(height: AppDimensions.paddingXL),
 
                 AppButton(
@@ -436,6 +540,69 @@ class _AdmitDialogState extends State<_AdmitDialog> {
           ),
         ),
       ),
+    );
+  }
+}
+
+// ─── Add Bed Dialog ────────────────────────────────────────────────────────
+
+class _AddBedDialog extends StatefulWidget {
+  final HospitalController controller;
+  const _AddBedDialog({required this.controller});
+
+  @override
+  State<_AddBedDialog> createState() => _AddBedDialogState();
+}
+
+class _AddBedDialogState extends State<_AddBedDialog> {
+  final _formKey = GlobalKey<FormState>();
+  final _bedCodeCtrl = TextEditingController();
+
+  @override
+  void dispose() {
+    _bedCodeCtrl.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    if (_formKey.currentState?.validate() ?? false) {
+      widget.controller.addBed();
+    }
+    Navigator.pop(context);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+      ),
+      title: const Text(AppStrings.addNewBed, style: AppTextStyles.heading3),
+      content: Form(
+        key: _formKey,
+        child: const Text('Are you sure?', style: AppTextStyles.bodyLarge),
+      ),
+      actions: [
+        Row(
+          children: [
+            Expanded(
+              child: AppButton(
+                label: AppStrings.addBed,
+                onPressed: _submit,
+                color: AppColors.hospitalPrimary,
+              ),
+            ),
+            SizedBox(width: AppDimensions.paddingS),
+            Expanded(
+              child: AppButton(
+                label: AppStrings.cancel,
+                style: AppButtonStyle.outline,
+                onPressed: Get.back,
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

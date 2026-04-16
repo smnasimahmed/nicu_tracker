@@ -53,6 +53,12 @@ class AppStrings {
       'Are you sure you want to discharge this patient? This action cannot be undone.';
   static const String confirmOccupyBed = 'CONFIRM & OCCUPY BED';
   static const String readyForAdmission = 'Ready for Admission';
+  static const String addNewBed = 'Add New Bed';
+  static const String addBed = 'Add Bed';
+  static const String bedCode = 'BedCode';
+  static const String bedCodeHint = 'Enter a new BedCode';
+  static const String delete = 'Delete';
+  static const String deleteBed = 'Delete Bed';
 
   // Admit Form
   static const String babyName = 'Baby Name';
@@ -60,6 +66,8 @@ class AppStrings {
   static const String relation = 'Relation';
   static const String contactName = 'Contact Name';
   static const String enterGuardianName = 'Enter guardian name';
+  static const String guardianPhone = 'Guardian Phone';
+  static const String guardianName = 'Guardian Name';
   static const String phoneNo = 'Phone No';
   static const String phoneHint = '01XXXXXXXXX';
 
@@ -76,6 +84,7 @@ class AppStrings {
   static const String guardianContactRequired = 'Guardian contact is required';
   static const String destinationRequired = 'Please select a destination hospital';
   static const String referralSentSuccess = 'Referral request sent successfully!';
+  static const String referrals = 'Referrals';
 
   // Referral History
   static const String referralHistory = 'Referral History';
@@ -92,12 +101,14 @@ class AppStrings {
   static const String completed = 'Completed';
   static const String confirm = 'Confirm';
   static const String cancelled = 'Cancelled';
+  static const String reject = 'Reject';
   static const String updateStatus = 'Update Status';
-  static const String confirmReferral = 'Confirm';
+  static const String confirmReferral = 'Confirm'; 
   static const String completeReferral = 'Complete';
   static const String cancelReferral = 'Cancel';
   static const String bedAdmitSuccess = 'Patient admitted successfully!';
   static const String bedDischargeSuccess = 'Patient discharged successfully!';
+  static const String approve = 'Approve';
 
   // Ambulance Navigation
   static const String addAmbulance = 'Add Ambulance';

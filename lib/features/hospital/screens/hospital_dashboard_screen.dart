@@ -21,43 +21,68 @@ class HospitalDashboardScreen extends StatelessWidget {
         return ListView(
           padding: const EdgeInsets.all(AppDimensions.paddingBase),
           children: [
-            // ── Welcome + Stats ────────────────────────────────────────
             Text(
               authCtrl.currentUser?.organizationName ?? AppStrings.appName,
               style: AppTextStyles.heading2,
             ),
             const SizedBox(height: AppDimensions.paddingBase),
-            GridView.count(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: MediaQuery.of(context).size.width > 600 ? 4 : 2,
-              crossAxisSpacing: AppDimensions.paddingM,
-              mainAxisSpacing: AppDimensions.paddingM,
-              childAspectRatio: 2.2,
+
+            // ── 3 Stat Cards in a single row ───────────────────────────
+            Row(
               children: [
-                _StatCard(
-                  label: AppStrings.totalBeds,
-                  value: controller.totalBeds.toString(),
-                  icon: Icons.bed_rounded,
-                  iconColor: AppColors.hospitalPrimary,
+                Expanded(
+                  child: _StatCard(
+                    label: AppStrings.totalBeds,
+                    value: controller.totalBeds.toString(),
+                    icon: Icons.bed_rounded,
+                    iconColor: AppColors.hospitalPrimary,
+                  ),
                 ),
-                _StatCard(
-                  label: AppStrings.availableBeds,
-                  value: controller.availableBeds.toString(),
-                  icon: Icons.check_circle_outline_rounded,
-                  iconColor: AppColors.statusAvailable,
+                const SizedBox(width: AppDimensions.paddingM),
+                Expanded(
+                  child: _StatCard(
+                    label: AppStrings.availableBeds,
+                    value: controller.availableBeds.toString(),
+                    icon: Icons.check_circle_outline_rounded,
+                    iconColor: AppColors.statusAvailable,
+                  ),
                 ),
-                _StatCard(
-                  label: AppStrings.occupiedBeds,
-                  value: controller.occupiedBeds.toString(),
-                  icon: Icons.error_outline_rounded,
-                  iconColor: AppColors.statusOccupied,
+                const SizedBox(width: AppDimensions.paddingM),
+                Expanded(
+                  child: _StatCard(
+                    label: AppStrings.occupiedBeds,
+                    value: controller.occupiedBeds.toString(),
+                    icon: Icons.error_outline_rounded,
+                    iconColor: AppColors.statusOccupied,
+                  ),
                 ),
-                _StatCard(
-                  label: AppStrings.incomingReferralsCount,
-                  value: controller.incomingReferralCount.toString(),
-                  icon: Icons.local_shipping_outlined,
-                  iconColor: AppColors.statusInTransit,
+              ],
+            ),
+
+            // ── Referrals row ──────────────────────────────────────────
+            const SizedBox(height: AppDimensions.paddingXL),
+            const Text(AppStrings.referrals, style: AppTextStyles.heading3),
+            const SizedBox(height: AppDimensions.paddingM),
+            Row(
+              children: [
+                Expanded(
+                  child: _ReferralStatCard(
+                    label: AppStrings.incomingReferrals,
+                    value: controller.incomingReferralCount.toString(),
+                    icon: Icons.south_west_rounded,
+                    accentColor: AppColors.hospitalPrimary,
+                    onTap: () => controller.changeTab(3),
+                  ),
+                ),
+                const SizedBox(width: AppDimensions.paddingM),
+                Expanded(
+                  child: _ReferralStatCard(
+                    label: AppStrings.outgoingReferrals,
+                    value: controller.outgoingReferralCount.toString(),
+                    icon: Icons.north_east_rounded,
+                    accentColor: const Color(0xFFF59E0B),
+                    onTap: () => controller.changeTab(3),
+                  ),
                 ),
               ],
             ),
@@ -100,7 +125,6 @@ class _StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
     return Container(
       padding: const EdgeInsets.all(AppDimensions.paddingM),
       decoration: BoxDecoration(
@@ -108,27 +132,86 @@ class _StatCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         border: Border.all(color: AppColors.border),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Row(
         children: [
-          Row(
-            children: [
-              Icon(icon, color: iconColor, size: AppDimensions.iconL),
-              SizedBox(width: screenWidth * 0.03),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    value,
-                    style: AppTextStyles.statNumber.copyWith(fontSize: 24),
-                  ),
-                  Text(label, style: AppTextStyles.statLabel),
-                ],
-              ),
-            ],
+          Icon(icon, color: iconColor, size: AppDimensions.iconL),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: AppTextStyles.statLabel,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  value,
+                  style: AppTextStyles.statNumber.copyWith(fontSize: 20),
+                ),
+              ],
+            ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _ReferralStatCard extends StatelessWidget {
+  final String label;
+  final String value;
+  final IconData icon;
+  final Color accentColor;
+  final VoidCallback? onTap;
+
+  const _ReferralStatCard({
+    required this.label,
+    required this.value,
+    required this.icon,
+    required this.accentColor,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(AppDimensions.paddingBase),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 4,
+              height: 40,
+              decoration: BoxDecoration(
+                color: accentColor,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(width: AppDimensions.paddingM),
+            Icon(icon, color: accentColor, size: 24),
+            const SizedBox(width: AppDimensions.paddingS),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(label, style: AppTextStyles.statLabel),
+                  Text(
+                    value,
+                    style: AppTextStyles.statNumber.copyWith(fontSize: 22),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

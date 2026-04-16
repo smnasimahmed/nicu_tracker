@@ -23,15 +23,18 @@ class _HospitalReferPatientScreenState
     extends State<HospitalReferPatientScreen> {
   final _formKey = GlobalKey<FormState>();
   final _babyNameCtrl = TextEditingController();
-  final _guardianContactCtrl = TextEditingController();
+  final _guardianNameCtrl = TextEditingController();
+  final _guardianPhoneCtrl = TextEditingController();
   final _reasonCtrl = TextEditingController();
+  String _relation = 'Father';
   HospitalModel? _selectedHospital;
   bool _showDropdown = false;
 
   @override
   void dispose() {
     _babyNameCtrl.dispose();
-    _guardianContactCtrl.dispose();
+    _guardianNameCtrl.dispose();
+    _guardianPhoneCtrl.dispose();
     _reasonCtrl.dispose();
     super.dispose();
   }
@@ -44,14 +47,19 @@ class _HospitalReferPatientScreenState
     if (_formKey.currentState?.validate() ?? false) {
       Get.find<HospitalController>().sendReferral(
         babyName: _babyNameCtrl.text.trim(),
-        guardianContact: _guardianContactCtrl.text.trim(),
+        guardianContact:
+            '${_guardianNameCtrl.text.trim()} (${_guardianPhoneCtrl.text.trim()})',
         reasonForTransfer: _reasonCtrl.text.trim(),
         toHospital: _selectedHospital!.name,
       );
       _babyNameCtrl.clear();
-      _guardianContactCtrl.clear();
+      _guardianNameCtrl.clear();
+      _guardianPhoneCtrl.clear();
       _reasonCtrl.clear();
-      setState(() => _selectedHospital = null);
+      setState(() {
+        _selectedHospital = null;
+        _relation = 'Father';
+      });
     }
   }
 
@@ -87,16 +95,67 @@ class _HospitalReferPatientScreenState
                     prefixIcon: Icon(Icons.child_care_rounded),
                   ),
                   const SizedBox(height: AppDimensions.paddingBase),
-                  AppTextField(
-                    label: AppStrings.currentGuardianContact,
-                    hint: AppStrings.guardianNameOrPhone,
-                    controller: _guardianContactCtrl,
-                    validator: (v) => (v == null || v.isEmpty)
-                        ? AppStrings.guardianContactRequired
-                        : null,
-                    prefixIcon: Icon(Icons.person_outline_rounded),
+
+                  // Relation dropdown
+                  const Text(
+                    AppStrings.relation,
+                    style: AppTextStyles.labelLarge,
+                  ),
+                  const SizedBox(height: AppDimensions.paddingS),
+                  DropdownButtonFormField<String>(
+                    value: _relation,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius:
+                            BorderRadius.circular(AppDimensions.radiusM),
+                        borderSide: const BorderSide(color: AppColors.border),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius:
+                            BorderRadius.circular(AppDimensions.radiusM),
+                        borderSide: const BorderSide(color: AppColors.border),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius:
+                            BorderRadius.circular(AppDimensions.radiusM),
+                        borderSide: const BorderSide(
+                            color: AppColors.hospitalPrimary, width: 2),
+                      ),
+                      filled: true,
+                      fillColor: AppColors.inputFill,
+                    ),
+                    items: ['Father', 'Mother', 'Guardian', 'Other']
+                        .map((r) => DropdownMenuItem(value: r, child: Text(r)))
+                        .toList(),
+                    onChanged: (v) => setState(() => _relation = v!),
                   ),
                   const SizedBox(height: AppDimensions.paddingBase),
+
+                  // Guardian Name
+                  AppTextField(
+                    label: AppStrings.guardianName,
+                    hint: AppStrings.enterGuardianName,
+                    controller: _guardianNameCtrl,
+                    prefixIcon: Icon(Icons.person_outline_rounded),
+                    validator: (v) => (v == null || v.isEmpty)
+                        ? AppStrings.fieldRequired
+                        : null,
+                  ),
+                  const SizedBox(height: AppDimensions.paddingBase),
+
+                  // Guardian Phone
+                  AppTextField(
+                    label: AppStrings.guardianPhone,
+                    hint: AppStrings.phoneHint,
+                    controller: _guardianPhoneCtrl,
+                    prefixIcon: Icon(Icons.phone_outlined),
+                    keyboardType: TextInputType.phone,
+                    validator: (v) => (v == null || v.isEmpty)
+                        ? AppStrings.fieldRequired
+                        : null,
+                  ),
+                  const SizedBox(height: AppDimensions.paddingBase),
+
                   AppTextField(
                     label: AppStrings.reasonForTransfer,
                     hint: AppStrings.describeReason,
@@ -116,22 +175,26 @@ class _HospitalReferPatientScreenState
                     style: AppTextStyles.labelLarge,
                   ),
                   const SizedBox(height: AppDimensions.paddingS),
-                  _HospitalDropdown(
+                  _HospitalSelector(
                     selected: _selectedHospital,
                     hospitals: DummyData.hospitals,
                     showDropdown: _showDropdown,
-                    onTap: () => setState(() => _showDropdown = !_showDropdown),
+                    onTap: () =>
+                        setState(() => _showDropdown = !_showDropdown),
                     onSelect: (h) => setState(() {
                       _selectedHospital = h;
                       _showDropdown = false;
                     }),
                   ),
+                  if (_selectedHospital != null) ...[
+                    const SizedBox(height: AppDimensions.paddingM),
+                    _SelectedHospitalCard(hospital: _selectedHospital!),
+                  ],
                   if (_selectedHospital == null && !_showDropdown)
                     Padding(
                       padding: const EdgeInsets.only(
-                        top: AppDimensions.paddingXS,
-                        left: AppDimensions.paddingM,
-                      ),
+                          top: AppDimensions.paddingXS,
+                          left: AppDimensions.paddingM),
                       child: Text(
                         AppStrings.destinationRequired,
                         style: const TextStyle(
@@ -157,14 +220,16 @@ class _HospitalReferPatientScreenState
   }
 }
 
-class _HospitalDropdown extends StatelessWidget {
+// ─── Hospital Selector Dropdown ────────────────────────────────────────────
+
+class _HospitalSelector extends StatelessWidget {
   final HospitalModel? selected;
   final List<HospitalModel> hospitals;
   final VoidCallback onTap;
   final bool showDropdown;
   final ValueChanged<HospitalModel> onSelect;
 
-  const _HospitalDropdown({
+  const _HospitalSelector({
     required this.selected,
     required this.hospitals,
     required this.onTap,
@@ -196,9 +261,12 @@ class _HospitalDropdown extends StatelessWidget {
             child: Row(
               children: [
                 Icon(Icons.apartment, color: AppColors.hospitalPrimaryLight),
+                const SizedBox(width: AppDimensions.paddingS),
                 Expanded(
                   child: Text(
-                    selected?.name ?? AppStrings.chooseHospital,
+                    selected != null
+                        ? selected!.name
+                        : AppStrings.chooseHospital,
                     style: selected != null
                         ? AppTextStyles.bodyMedium
                         : AppTextStyles.hintText,
@@ -230,37 +298,126 @@ class _HospitalDropdown extends StatelessWidget {
               ],
             ),
             child: Column(
-              children: hospitals.map((h) {
+              children: hospitals.asMap().entries.map((entry) {
+                final i = entry.key;
+                final h = entry.value;
                 final isAvailable = h.availableBeds > 0;
-                return InkWell(
-                  onTap: isAvailable ? () => onSelect(h) : null,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppDimensions.paddingBase,
-                      vertical: AppDimensions.paddingM,
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            '${h.name} – ${h.availableBeds} '
-                            '${h.availableBeds == 0 ? AppStrings.noBedsAvailable : AppStrings.bedsAvailable}',
-                            style: TextStyle(
-                              fontSize: AppDimensions.fontM,
-                              color: isAvailable
-                                  ? AppColors.textPrimary
-                                  : AppColors.textHint,
-                            ),
-                          ),
+                final isSelected = selected?.id == h.id;
+                return Column(
+                  children: [
+                    InkWell(
+                      onTap: isAvailable ? () => onSelect(h) : null,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppDimensions.paddingBase,
+                          vertical: AppDimensions.paddingM,
                         ),
-                      ],
+                        child: Row(
+                          children: [
+                            if (isSelected)
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    right: AppDimensions.paddingS),
+                                child: Icon(
+                                  Icons.check_rounded,
+                                  size: 16,
+                                  color: AppColors.hospitalPrimary,
+                                ),
+                              ),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '${h.name} \u2013 ${h.availableBeds} '
+                                    '${h.availableBeds == 0 ? AppStrings.noBedsAvailable : AppStrings.bedsAvailable}',
+                                    style: TextStyle(
+                                      fontSize: AppDimensions.fontM,
+                                      fontWeight: FontWeight.w500,
+                                      color: isAvailable
+                                          ? AppColors.textPrimary
+                                          : AppColors.textHint,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    _locationLabel(h),
+                                    style: TextStyle(
+                                      fontSize: AppDimensions.fontS,
+                                      color: AppColors.textSecondary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
+                    if (i < hospitals.length - 1)
+                      Divider(height: 1, color: AppColors.border),
+                  ],
                 );
               }).toList(),
             ),
           ),
       ],
+    );
+  }
+
+  String _locationLabel(HospitalModel h) {
+    // Use district/division if available, otherwise derive from address
+    if (h.district != null && h.division != null) {
+      return '${h.district}, ${h.division}';
+    }
+    return h.address;
+  }
+}
+
+// ─── Selected Hospital Card ────────────────────────────────────────────────
+
+class _SelectedHospitalCard extends StatelessWidget {
+  final HospitalModel hospital;
+  const _SelectedHospitalCard({required this.hospital});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(AppDimensions.paddingBase),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        border: Border.all(color: AppColors.border),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(hospital.name, style: AppTextStyles.cardTitle),
+          const SizedBox(height: 4),
+          Row(
+            children: [
+              const Icon(Icons.location_on_outlined,
+                  size: 14, color: AppColors.textSecondary),
+              const SizedBox(width: 4),
+              Text(
+                hospital.district != null && hospital.division != null
+                    ? '${hospital.district}, ${hospital.division}'
+                    : hospital.address,
+                style: AppTextStyles.bodySmall,
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            '${hospital.availableBeds} beds available',
+            style: TextStyle(
+              fontSize: AppDimensions.fontS,
+              color: AppColors.statusAvailable,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

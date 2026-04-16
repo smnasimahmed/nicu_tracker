@@ -14,8 +14,12 @@ class HospitalController extends GetxController {
   List<NicuBedModel> beds = List.from(DummyData.nicuBeds);
 
   // Referrals
-  List<ReferralModel> outgoingReferrals = List.from(DummyData.outgoingReferrals);
-  List<ReferralModel> incomingReferrals = List.from(DummyData.incomingReferrals);
+  List<ReferralModel> outgoingReferrals = List.from(
+    DummyData.outgoingReferrals,
+  );
+  List<ReferralModel> incomingReferrals = List.from(
+    DummyData.incomingReferrals,
+  );
 
   // Derived stats
   int get totalBeds => beds.length;
@@ -24,6 +28,8 @@ class HospitalController extends GetxController {
   int get occupiedBeds =>
       beds.where((b) => b.status == BedStatus.occupied).length;
   int get incomingReferralCount =>
+      incomingReferrals.where((r) => r.status == ReferralStatus.pending).length;
+  int get outgoingReferralCount =>
       incomingReferrals.where((r) => r.status == ReferralStatus.pending).length;
 
   void changeTab(int index) {
@@ -122,8 +128,9 @@ class HospitalController extends GetxController {
   void cancelOutgoingReferral(String referralId) {
     final idx = outgoingReferrals.indexWhere((r) => r.id == referralId);
     if (idx == -1) return;
-    outgoingReferrals[idx] =
-        outgoingReferrals[idx].copyWith(status: ReferralStatus.cancelled);
+    outgoingReferrals[idx] = outgoingReferrals[idx].copyWith(
+      status: ReferralStatus.cancelled,
+    );
     update();
     Get.snackbar(
       'Referral cancelled',
@@ -149,6 +156,86 @@ class HospitalController extends GetxController {
       snackPosition: SnackPosition.BOTTOM,
       backgroundColor: Colors.green.shade100,
       colorText: Colors.green.shade800,
+      duration: const Duration(seconds: 2),
+      margin: const EdgeInsets.all(12),
+    );
+  }
+
+  // ─── Create New Bed ──────────────────────────────────────
+  void addBed() {
+    int counter = 1;
+    String newCode = '';
+
+    // 🔁 Find next available NICU code
+    while (true) {
+      newCode = 'NICU-${counter.toString().padLeft(2, '0')}';
+
+      final exists = beds.any(
+        (b) => b.bedCode.toLowerCase() == newCode.toLowerCase(),
+      );
+
+      if (!exists) break;
+
+      counter++;
+    }
+
+    // ✅ Create new bed
+    final newBed = NicuBedModel(
+      id: 'bed_${DateTime.now().millisecondsSinceEpoch}',
+      bedCode: newCode,
+      status: BedStatus.available,
+    );
+
+    beds.add(newBed);
+
+    // 🔥 Optional but very nice UX
+    beds.sort((a, b) => a.bedCode.compareTo(b.bedCode));
+
+    update();
+
+    Get.snackbar(
+      'Success',
+      'Bed $newCode created',
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Colors.green.shade100,
+      colorText: Colors.green.shade800,
+      duration: const Duration(seconds: 2),
+      margin: const EdgeInsets.all(12),
+    );
+  }
+
+  // ─── Delete Bed ──────────────────────────────────────
+  void deleteBed(String bedId) {
+    final idx = beds.indexWhere((b) => b.id == bedId);
+
+    if (idx == -1) return;
+
+    final bed = beds[idx];
+
+    // Prevent deleting occupied bed
+    if (bed.status == BedStatus.occupied) {
+      Get.snackbar(
+        'Error',
+        'Cannot delete an occupied bed',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red.shade100,
+        colorText: Colors.red.shade800,
+        duration: const Duration(seconds: 2),
+        margin: const EdgeInsets.all(12),
+      );
+      return;
+    }
+
+    beds.removeAt(idx);
+
+    update();
+
+    Get.snackbar(
+      'Deleted',
+      'Bed ${bed.bedCode} removed',
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Colors.orange.shade100,
+      colorText: Colors.orange.shade800,
       duration: const Duration(seconds: 2),
       margin: const EdgeInsets.all(12),
     );

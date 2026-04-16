@@ -12,7 +12,6 @@ import 'hospital_dashboard_screen.dart';
 import 'hospital_nicu_beds_screen.dart';
 import 'hospital_refer_patient_screen.dart';
 import 'hospital_refer_history_screen.dart';
-import 'hospital_incoming_referrals_screen.dart';
 import 'hospital_profile_screen.dart';
 
 class HospitalMainScreen extends StatelessWidget {
@@ -24,7 +23,6 @@ class HospitalMainScreen extends StatelessWidget {
       case 1: return AppStrings.nicuBedsManagement;
       case 2: return AppStrings.referPatient;
       case 3: return AppStrings.referralHistory;
-      case 4: return AppStrings.incomingReferrals;
       default: return AppStrings.dashboard;
     }
   }
@@ -35,7 +33,6 @@ class HospitalMainScreen extends StatelessWidget {
       case 1: return const HospitalNicuBedsScreen();
       case 2: return const HospitalReferPatientScreen();
       case 3: return const HospitalReferHistoryScreen();
-      case 4: return const HospitalIncomingReferralsScreen();
       default: return const HospitalDashboardScreen();
     }
   }
@@ -145,12 +142,6 @@ class _HospitalBottomNav extends StatelessWidget {
                 label: AppStrings.referHistory,
                 selected: controller.currentTabIndex == 3,
                 onTap: () => controller.changeTab(3),
-              ),
-              _NavItem(
-                icon: Icons.inbox_rounded,
-                label: AppStrings.incomingReferrals,
-                selected: controller.currentTabIndex == 4,
-                onTap: () => controller.changeTab(4),
               ),
             ],
           ),
